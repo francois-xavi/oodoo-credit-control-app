@@ -6,3 +6,5 @@ __pycache__/
 # Sauvegardes de base
 *.zip
 *.dump
+# Sauvegardes de base (volumineuses)
+backups/
