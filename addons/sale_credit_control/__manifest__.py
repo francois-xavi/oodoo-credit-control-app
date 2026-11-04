@@ -24,7 +24,9 @@ Ce module :
     "license": "LGPL-3",
     "depends": ["sale", "mail"],
     # Ordre de chargement : sécurité -> wizard -> vues -> menus.
-    "data": [],
+    "data": [
+        "views/res_partner_views.xml",
+    ],
     "installable": True,
     "application": False,
 }
