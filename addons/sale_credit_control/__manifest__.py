@@ -26,6 +26,7 @@ Ce module :
     # Ordre de chargement : sécurité -> wizard -> vues -> menus.
     "data": [
         "views/res_partner_views.xml",
+        "views/sale_order_views.xml",
     ],
     "installable": True,
     "application": False,

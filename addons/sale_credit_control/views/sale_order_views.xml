@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_credit_control" model="ir.ui.view">
+        <field name="name">sale.order.form.credit.control</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Bandeau rouge : le commercial voit le risque pendant qu'il
+                 négocie, avant même de cliquer sur Confirmer. -->
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-danger mb-0" role="alert"
+                     invisible="not credit_block_reason">
+                    <div class="fw-bold">
+                        <i class="fa fa-ban me-1" title="Bloqué"/>
+                        Contrôle du crédit : cette commande ne peut pas être confirmée sans dérogation
+                    </div>
+                    <field name="credit_block_reason"/>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
