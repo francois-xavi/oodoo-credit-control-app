@@ -1,0 +1,36 @@
+# Environnement local de démo : Odoo 18 Community + PostgreSQL 16
+# Démarrer : docker compose up -d      Logs : docker compose logs -f --tail=100 odoo
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    # Pas de port exposé : un PostgreSQL Windows occupe déjà le 5432.
+    restart: unless-stopped
+
+  odoo:
+    image: odoo:18
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: odoo
+    volumes:
+      - ./addons:/mnt/extra-addons
+      - ./config:/etc/odoo
+      - odoo-web-data:/var/lib/odoo
+    # --dev=xml : les vues XML se rechargent sans redémarrer Odoo.
+    command: -- --dev=xml
+    restart: unless-stopped
+
+volumes:
+  odoo-db-data:
+  odoo-web-data:

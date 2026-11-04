@@ -1,0 +1,8 @@
+# Config locale (contient le mot de passe maître)
+config/odoo.conf
+# Python
+__pycache__/
+*.pyc
+# Sauvegardes de base
+*.zip
+*.dump

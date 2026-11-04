@@ -1,0 +1,5 @@
+[options]
+addons_path = /mnt/extra-addons
+data_dir = /var/lib/odoo
+; Mot de passe maître du gestionnaire de bases (local uniquement)
+admin_passwd = A_CHANGER
