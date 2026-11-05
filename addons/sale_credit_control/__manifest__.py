@@ -25,8 +25,13 @@ Ce module :
     "depends": ["sale", "mail"],
     # Ordre de chargement : sécurité -> wizard -> vues -> menus.
     "data": [
+        "security/security.xml",
+        "security/ir.model.access.csv",
+        "data/mail_activity_type_data.xml",
+        "wizard/credit_decision_wizard_views.xml",
         "views/res_partner_views.xml",
         "views/sale_order_views.xml",
+        "views/credit_override_log_views.xml",
     ],
     "installable": True,
     "application": False,

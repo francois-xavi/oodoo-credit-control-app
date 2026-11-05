@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_credit_control" model="ir.module.category">
+        <field name="name">Contrôle du crédit</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <!-- Responsable crédit : fixe les plafonds et approuve les dérogations.
+         Hérite des droits commerciaux pour voir toutes les commandes. -->
+    <record id="group_credit_manager" model="res.groups">
+        <field name="name">Responsable crédit</field>
+        <field name="category_id" ref="module_category_credit_control"/>
+        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

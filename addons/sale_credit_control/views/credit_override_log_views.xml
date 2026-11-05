@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="credit_override_log_view_list" model="ir.ui.view">
+        <field name="name">credit.override.log.list</field>
+        <field name="model">credit.override.log</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0"
+                  decoration-success="decision == 'approved'" decoration-danger="decision == 'refused'">
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="order_id"/>
+                <field name="salesperson_id" widget="many2one_avatar_user"/>
+                <field name="decision" widget="badge"
+                       decoration-success="decision == 'approved'"
+                       decoration-danger="decision == 'refused'"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="order_amount" sum="Total"/>
+                <field name="exposure_at_decision"/>
+                <field name="limit_at_decision"/>
+                <field name="reason"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="company_currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="credit_override_log_view_form" model="ir.ui.view">
+        <field name="name">credit.override.log.form</field>
+        <field name="model">credit.override.log</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="order_id"/></h1>
+                        <field name="decision" widget="badge"
+                               decoration-success="decision == 'approved'"
+                               decoration-danger="decision == 'refused'"/>
+                    </div>
+                    <group>
+                        <group string="Décision">
+                            <field name="date"/>
+                            <field name="user_id"/>
+                            <field name="reason"/>
+                        </group>
+                        <group string="Situation au moment de la décision">
+                            <field name="partner_id"/>
+                            <field name="salesperson_id"/>
+                            <field name="order_amount"/>
+                            <field name="exposure_at_decision"/>
+                            <field name="limit_at_decision"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Demande">
+                        <field name="block_reason"/>
+                        <field name="request_note"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="credit_override_log_view_search" model="ir.ui.view">
+        <field name="name">credit.override.log.search</field>
+        <field name="model">credit.override.log</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="order_id"/>
+                <field name="user_id"/>
+                <field name="salesperson_id"/>
+                <filter name="approved" string="Approuvées" domain="[('decision', '=', 'approved')]"/>
+                <filter name="refused" string="Refusées" domain="[('decision', '=', 'refused')]"/>
+                <separator/>
+                <filter name="this_month" string="Ce mois-ci" date="date"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_partner" string="Client" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_salesperson" string="Commercial" context="{'group_by': 'salesperson_id'}"/>
+                    <filter name="group_user" string="Décidé par" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_decision" string="Décision" context="{'group_by': 'decision'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_credit_override_log" model="ir.actions.act_window">
+        <field name="name">Journal des dérogations</field>
+        <field name="res_model">credit.override.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucune dérogation pour le moment</p>
+            <p>Chaque approbation ou refus de dérogation crédit est enregistré ici, avec la situation du client au moment de la décision.</p>
+        </field>
+    </record>
+</odoo>

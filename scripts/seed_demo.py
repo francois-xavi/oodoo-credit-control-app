@@ -13,6 +13,7 @@ from odoo import fields
 
 # Compte de test local (base `demo` sur cette machine uniquement).
 PAUL_LOGIN = "paul"
+PAUL_EMAIL = "paul@yourcompany.example.com"
 PAUL_PASSWORD = "Paul-xaIvFHTFo-HS"
 
 today = fields.Date.context_today(env.user)
@@ -28,6 +29,7 @@ if not paul:
         "name": "Paul Commercial",
         "login": PAUL_LOGIN,
         "password": PAUL_PASSWORD,
+        "email": PAUL_EMAIL,
         "lang": "fr_FR",
         "tz": env.user.tz,
         "groups_id": [(6, 0, [
@@ -38,6 +40,9 @@ if not paul:
     print("Utilisateur créé :", paul.name)
 else:
     print("Utilisateur déjà présent :", paul.name)
+# Odoo exige un e-mail d'expéditeur pour notifier les activités.
+if not paul.email:
+    paul.email = PAUL_EMAIL
 
 # ----------------------------------------------------------------------
 # 2. Produit sans taxe : des montants ronds, faciles à suivre en démo

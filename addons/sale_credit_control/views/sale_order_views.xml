@@ -6,17 +6,101 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
 
-            <!-- Bandeau rouge : le commercial voit le risque pendant qu'il
-                 négocie, avant même de cliquer sur Confirmer. -->
+            <!-- Boutons du circuit, à côté de « Confirmer » -->
+            <xpath expr="//header/button[@id='action_confirm']" position="before">
+                <button name="action_request_credit_override" type="object"
+                        string="Demander une dérogation" class="btn-primary"
+                        icon="fa-paper-plane" invisible="not credit_can_request"/>
+                <button name="action_approve_credit_override" type="object"
+                        string="Approuver la dérogation" class="btn-success" icon="fa-check"
+                        invisible="credit_approval_state != 'pending' or state not in ('draft', 'sent')"
+                        groups="sale_credit_control.group_credit_manager"/>
+                <button name="action_refuse_credit_override" type="object"
+                        string="Refuser" class="btn-danger" icon="fa-times"
+                        invisible="credit_approval_state != 'pending' or state not in ('draft', 'sent')"
+                        groups="sale_credit_control.group_credit_manager"/>
+            </xpath>
+
+            <!-- Bandeaux : le commercial voit le risque pendant qu'il négocie -->
             <xpath expr="//sheet" position="before">
+                <field name="credit_approval_valid" invisible="1"/>
+                <field name="credit_can_request" invisible="1"/>
+
+                <!-- Rouge : bloqué, aucune dérogation valable -->
                 <div class="alert alert-danger mb-0" role="alert"
-                     invisible="not credit_block_reason">
+                     invisible="not credit_block_reason or credit_approval_valid or credit_approval_state == 'pending'">
                     <div class="fw-bold">
                         <i class="fa fa-ban me-1" title="Bloqué"/>
                         Contrôle du crédit : cette commande ne peut pas être confirmée sans dérogation
                     </div>
                     <field name="credit_block_reason"/>
+                    <div invisible="credit_approval_state != 'approved'" class="mt-1">
+                        <i class="fa fa-exclamation-triangle me-1" title="Attention"/>
+                        La dérogation accordée pour
+                        <field name="credit_approved_amount" class="d-inline fw-bold"/>
+                        ne couvre plus le montant actuel : une nouvelle dérogation est nécessaire.
+                    </div>
+                    <div invisible="credit_approval_state != 'refused'" class="mt-1">
+                        <i class="fa fa-times-circle me-1" title="Refusée"/>
+                        Dernière décision : <field name="credit_last_decision" class="d-inline"/>
+                    </div>
                 </div>
+
+                <!-- Orange : demande en attente -->
+                <div class="alert alert-warning mb-0" role="alert"
+                     invisible="credit_approval_state != 'pending' or state not in ('draft', 'sent')">
+                    <div class="fw-bold">
+                        <i class="fa fa-hourglass-half me-1" title="En attente"/>
+                        Dérogation crédit demandée : en attente de la décision du responsable crédit
+                    </div>
+                    <field name="credit_block_reason"/>
+                    <div class="mt-1"><i>Justification :</i> <field name="credit_request_note" class="d-inline"/></div>
+                </div>
+
+                <!-- Vert : dérogation accordée et toujours valable -->
+                <div class="alert alert-success mb-0" role="alert"
+                     invisible="not credit_block_reason or not credit_approval_valid">
+                    <div class="fw-bold">
+                        <i class="fa fa-check-circle me-1" title="Accordée"/>
+                        Dérogation crédit accordée : la commande peut être confirmée
+                    </div>
+                    <field name="credit_last_decision"/>
+                </div>
+            </xpath>
+
+            <!-- Badge à côté du client -->
+            <xpath expr="//group[@name='partner_details']/field[@name='partner_id']" position="after">
+                <field name="credit_approval_state" widget="badge"
+                       invisible="credit_approval_state == 'none'"
+                       decoration-warning="credit_approval_state == 'pending'"
+                       decoration-success="credit_approval_state == 'approved'"
+                       decoration-danger="credit_approval_state == 'refused'"/>
+            </xpath>
+
+            <!-- Historique des décisions sur cette commande -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Dérogations crédit" name="credit_overrides"
+                      invisible="credit_approval_state == 'none' and not credit_override_ids">
+                    <group>
+                        <field name="credit_request_note"/>
+                        <field name="credit_approved_amount" invisible="credit_approval_state != 'approved'"/>
+                    </group>
+                    <field name="credit_override_ids">
+                        <list decoration-success="decision == 'approved'" decoration-danger="decision == 'refused'">
+                            <field name="date"/>
+                            <field name="decision" widget="badge"
+                                   decoration-success="decision == 'approved'"
+                                   decoration-danger="decision == 'refused'"/>
+                            <field name="user_id"/>
+                            <field name="order_amount"/>
+                            <field name="exposure_at_decision"/>
+                            <field name="limit_at_decision"/>
+                            <field name="reason"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="company_currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                </page>
             </xpath>
 
         </field>

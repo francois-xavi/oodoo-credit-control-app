@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Type d'activité dédié : les demandes de dérogation se distinguent
+         des autres tâches et se clôturent sans toucher aux autres. -->
+    <record id="mail_activity_type_credit_override" model="mail.activity.type">
+        <field name="name">Dérogation crédit</field>
+        <field name="summary">Dérogation crédit à décider</field>
+        <field name="icon">fa-credit-card</field>
+        <field name="res_model">sale.order</field>
+        <field name="delay_count">0</field>
+        <field name="decoration_type">warning</field>
+    </record>
+</odoo>

@@ -1,1 +1,1 @@
-# Fenêtres d'assistance (wizards) du contrôle de crédit.
+from . import credit_decision_wizard
