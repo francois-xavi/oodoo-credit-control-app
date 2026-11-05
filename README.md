@@ -19,7 +19,7 @@ Puis ouvrir http://localhost:8069
 
 - Créer les données (idempotent, relançable sans doublons) :
   `docker compose run --rm -T odoo odoo shell -d demo --no-http < scripts/seed_demo.py`
-- Sauvegarde de référence : `backups/demo_etape8.zip` (la plus récente) (non versionnée).
+- Sauvegarde de référence : `backups/demo_pret_pour_demo.zip` (état propre, prêt pour la démo) (non versionnée).
   Restaurer : http://localhost:8069/web/database/manager → « Restaurer une base », avec le mot de passe maître.
   Attention : les retards sont relatifs à la date de création des factures.
 

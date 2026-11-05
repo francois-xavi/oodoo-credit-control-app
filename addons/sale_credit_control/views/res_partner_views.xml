@@ -89,11 +89,11 @@
                 <field name="credit_policy" widget="badge"
                        decoration-danger="credit_policy == 'blocked'"
                        decoration-info="credit_policy == 'exempt'"/>
-                <field name="sale_credit_limit"/>
+                <field name="sale_credit_limit" invisible="credit_policy == 'exempt'"/>
                 <field name="credit_exposure"/>
-                <field name="credit_available"
-                       decoration-danger="credit_available &lt; 0 and credit_policy != 'exempt'"
-                       decoration-success="credit_available &gt;= 0 and credit_policy != 'exempt'"/>
+                <field name="credit_available" invisible="credit_policy == 'exempt'"
+                       decoration-danger="credit_available &lt; 0"
+                       decoration-success="credit_available &gt;= 0"/>
                 <field name="credit_overdue_count" decoration-danger="credit_overdue_count &gt; 0"/>
                 <field name="credit_overdue_amount" decoration-danger="credit_overdue_amount &gt; 0"/>
                 <field name="credit_overdue_max_days" decoration-danger="credit_overdue_max_days &gt; 0"/>

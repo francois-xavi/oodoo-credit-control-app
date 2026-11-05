@@ -24,8 +24,12 @@
                 <label for="reason" string="Justification de la demande" invisible="decision != 'request'"/>
                 <label for="reason" string="Motif de l'approbation" invisible="decision != 'approved'"/>
                 <label for="reason" string="Motif du refus" invisible="decision != 'refused'"/>
-                <field name="reason" nolabel="1"
+                <field name="reason" nolabel="1" invisible="decision != 'request'"
                        placeholder="Ex. : client historique, paiement promis vendredi, acompte de 30 % reçu..."/>
+                <field name="reason" nolabel="1" invisible="decision != 'approved'"
+                       placeholder="Ex. : accordé avec acompte de 30 % exigé à la livraison..."/>
+                <field name="reason" nolabel="1" invisible="decision != 'refused'"
+                       placeholder="Ex. : régler d'abord la facture en retard, ou payer comptant..."/>
 
                 <footer>
                     <button name="action_validate" type="object" string="Envoyer la demande"
