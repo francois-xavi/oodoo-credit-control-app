@@ -75,4 +75,66 @@
 
         </field>
     </record>
+
+    <!-- Situation crédit de tous les clients : la vue de pilotage -->
+    <record id="view_partner_credit_situation_list" model="ir.ui.view">
+        <field name="name">res.partner.credit.situation.list</field>
+        <field name="model">res.partner</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-danger="credit_policy == 'blocked'"
+                  decoration-muted="credit_policy == 'exempt'">
+                <field name="name"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="credit_policy" widget="badge"
+                       decoration-danger="credit_policy == 'blocked'"
+                       decoration-info="credit_policy == 'exempt'"/>
+                <field name="sale_credit_limit"/>
+                <field name="credit_exposure"/>
+                <field name="credit_available"
+                       decoration-danger="credit_available &lt; 0 and credit_policy != 'exempt'"
+                       decoration-success="credit_available &gt;= 0 and credit_policy != 'exempt'"/>
+                <field name="credit_overdue_count" decoration-danger="credit_overdue_count &gt; 0"/>
+                <field name="credit_overdue_amount" decoration-danger="credit_overdue_amount &gt; 0"/>
+                <field name="credit_overdue_max_days" decoration-danger="credit_overdue_max_days &gt; 0"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_partner_credit_situation_search" model="ir.ui.view">
+        <field name="name">res.partner.credit.situation.search</field>
+        <field name="model">res.partner</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="user_id"/>
+                <filter name="my_customers" string="Mes clients" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="over_limit" string="En dépassement"
+                        domain="[('credit_policy', '=', 'normal'), ('credit_available', '&lt;', 0)]"/>
+                <filter name="overdue" string="Factures en retard" domain="[('credit_overdue_count', '&gt;', 0)]"/>
+                <separator/>
+                <filter name="blocked" string="Bloqués" domain="[('credit_policy', '=', 'blocked')]"/>
+                <filter name="exempt" string="Exemptés" domain="[('credit_policy', '=', 'exempt')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_policy" string="Statut crédit" context="{'group_by': 'credit_policy'}"/>
+                    <filter name="group_user" string="Commercial" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_partner_credit_situation" model="ir.actions.act_window">
+        <field name="name">Situation crédit clients</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_company', '=', True), ('customer_rank', '&gt;', 0)]</field>
+        <field name="context">{'default_is_company': True}</field>
+        <field name="search_view_id" ref="view_partner_credit_situation_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_partner_credit_situation_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('base.view_partner_form')})]"/>
+    </record>
 </odoo>

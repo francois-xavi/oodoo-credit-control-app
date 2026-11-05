@@ -105,4 +105,38 @@
 
         </field>
     </record>
+
+    <!-- File d'attente du responsable crédit -->
+    <record id="view_order_credit_pending_list" model="ir.ui.view">
+        <field name="name">sale.order.credit.pending.list</field>
+        <field name="model">sale.order</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <list create="0">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="amount_total" sum="Total"/>
+                <field name="credit_block_reason"/>
+                <field name="credit_request_note"/>
+                <field name="write_date" string="Dernière mise à jour" optional="hide"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_credit_pending_orders" model="ir.actions.act_window">
+        <field name="name">Dérogations à approuver</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('credit_approval_state', '=', 'pending'), ('state', 'in', ('draft', 'sent'))]</field>
+        <field name="context">{'create': False}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_order_credit_pending_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('sale.view_order_form')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucune dérogation en attente</p>
+            <p>Les demandes de dérogation crédit des commerciaux apparaissent ici.</p>
+        </field>
+    </record>
 </odoo>

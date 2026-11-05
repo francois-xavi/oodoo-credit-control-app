@@ -5,6 +5,8 @@ from odoo.exceptions import AccessError, UserError
 from odoo.tools import float_compare
 from odoo.tools.misc import formatLang
 
+from .res_partner import CREDIT_SITUATION_FIELDS
+
 CREDIT_MANAGER_GROUP = "sale_credit_control.group_credit_manager"
 CREDIT_ACTIVITY_TYPE = "sale_credit_control.mail_activity_type_credit_override"
 
@@ -98,6 +100,8 @@ class SaleOrder(models.Model):
         params = partner._get_credit_params()
         if not params["enabled"] or partner.credit_policy == "exempt":
             return False
+        # Toujours décider sur l'encours à jour, jamais sur une valeur en cache
+        partner.invalidate_recordset(CREDIT_SITUATION_FIELDS)
 
         def fmt(amount):
             return formatLang(self.env, amount, currency_obj=company.currency_id)
@@ -150,6 +154,18 @@ class SaleOrder(models.Model):
                 precision_rounding=self.currency_id.rounding or 0.01,
             ) <= 0
         )
+
+    def action_confirm(self):
+        """Confirmation groupée (plusieurs commandes sélectionnées) : on
+        confirme une par une, pour que chaque commande soit contrôlée avec
+        l'encours qui inclut les précédentes. Sinon, trois commandes de 2 000
+        pour un client à 4 000 de disponible passeraient toutes ensemble.
+        En cas de blocage, l'erreur annule tout le lot."""
+        if len(self) > 1:
+            for order in self:
+                order.action_confirm()
+            return True
+        return super().action_confirm()
 
     def _confirmation_error_message(self):
         """Point d'extension natif appelé par action_confirm() pour chaque

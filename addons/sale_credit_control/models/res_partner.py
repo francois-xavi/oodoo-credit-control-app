@@ -3,6 +3,11 @@ from odoo.exceptions import AccessError
 
 CREDIT_MANAGER_GROUP = "sale_credit_control.group_credit_manager"
 CREDIT_POLICY_FIELDS = ("sale_credit_limit", "credit_policy")
+# Champs calculés à relire « frais » avant chaque décision
+CREDIT_SITUATION_FIELDS = [
+    "credit_invoiced_due", "credit_uninvoiced_orders", "credit_exposure", "credit_available",
+    "credit_overdue_amount", "credit_overdue_count", "credit_overdue_max_days",
+]
 
 
 class ResPartner(models.Model):
@@ -49,12 +54,14 @@ class ResPartner(models.Model):
     )
     credit_available = fields.Monetary(
         string="Crédit disponible", compute="_compute_credit_situation",
+        search="_search_credit_available",
     )
     credit_overdue_amount = fields.Monetary(
         string="Montant en retard", compute="_compute_credit_situation",
     )
     credit_overdue_count = fields.Integer(
         string="Factures en retard", compute="_compute_credit_situation",
+        search="_search_credit_overdue_count",
     )
     credit_overdue_max_days = fields.Integer(
         string="Retard maximum (jours)", compute="_compute_credit_situation",
@@ -67,6 +74,36 @@ class ResPartner(models.Model):
     @api.model
     def _commercial_fields(self):
         return super()._commercial_fields() + ["sale_credit_limit", "credit_policy"]
+
+    # ------------------------------------------------------------------
+    # Recherche sur des champs calculés non stockés (filtres « En
+    # dépassement », « En retard ») : on calcule la situation des sociétés
+    # clientes en une passe groupée, puis on garde celles qui répondent.
+    # Suffisant pour une PME ; au-delà de quelques milliers de clients, on
+    # stockerait l'encours, mis à jour à chaque facture et paiement.
+    # ------------------------------------------------------------------
+    _CREDIT_SEARCH_OPERATORS = {
+        "<": lambda a, b: a < b,
+        "<=": lambda a, b: a <= b,
+        ">": lambda a, b: a > b,
+        ">=": lambda a, b: a >= b,
+        "=": lambda a, b: a == b,
+        "!=": lambda a, b: a != b,
+    }
+
+    def _search_credit_field(self, field_name, operator, value):
+        compare = self._CREDIT_SEARCH_OPERATORS.get(operator)
+        if compare is None:
+            raise NotImplementedError(f"Opérateur {operator} non pris en charge sur {field_name}")
+        candidates = self.search([("is_company", "=", True), ("customer_rank", ">", 0)])
+        candidates.invalidate_recordset(CREDIT_SITUATION_FIELDS)
+        return [("id", "in", candidates.filtered(lambda p: compare(p[field_name], value)).ids)]
+
+    def _search_credit_available(self, operator, value):
+        return self._search_credit_field("credit_available", operator, value)
+
+    def _search_credit_overdue_count(self, operator, value):
+        return self._search_credit_field("credit_overdue_count", operator, value)
 
     # ------------------------------------------------------------------
     # Sécurité : seul un responsable crédit fixe la politique de crédit.

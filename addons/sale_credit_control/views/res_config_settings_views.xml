@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_credit_control" model="ir.ui.view">
+        <field name="name">res.config.settings.form.credit.control</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='sale_management']" position="inside">
+                <block title="Contrôle du crédit client" name="credit_control_setting_container">
+                    <setting id="credit_control_enabled_setting"
+                             help="Bloque la confirmation des commandes à risque (dépassement, retard, client bloqué) et impose une dérogation tracée.">
+                        <field name="credit_control_enabled"/>
+                    </setting>
+                    <setting id="credit_overdue_tolerance_setting" string="Tolérance de retard"
+                             help="Nombre de jours de retard tolérés sur une facture avant de bloquer le client."
+                             invisible="not credit_control_enabled">
+                        <field name="credit_overdue_tolerance_days" class="o_light_label oe_inline"/> jours
+                    </setting>
+                    <setting id="credit_tolerance_pct_setting" string="Tolérance de dépassement"
+                             help="Dépassement du plafond accepté sans dérogation."
+                             invisible="not credit_control_enabled">
+                        <field name="credit_tolerance_pct" class="o_light_label oe_inline"/> %
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

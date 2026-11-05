@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Ventes > Contrôle du crédit -->
+    <menuitem id="menu_credit_control_root"
+              name="Contrôle du crédit"
+              parent="sale.sale_menu_root"
+              sequence="25"
+              groups="sales_team.group_sale_salesman"/>
+
+    <menuitem id="menu_credit_pending_orders"
+              name="Dérogations à approuver"
+              parent="menu_credit_control_root"
+              action="action_credit_pending_orders"
+              sequence="10"
+              groups="group_credit_manager"/>
+
+    <menuitem id="menu_credit_partner_situation"
+              name="Situation crédit clients"
+              parent="menu_credit_control_root"
+              action="action_partner_credit_situation"
+              sequence="20"/>
+
+    <menuitem id="menu_credit_override_log"
+              name="Journal des dérogations"
+              parent="menu_credit_control_root"
+              action="action_credit_override_log"
+              sequence="30"/>
+</odoo>
