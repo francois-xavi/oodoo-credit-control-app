@@ -52,6 +52,19 @@ class SaleOrder(models.Model):
     )
     credit_can_request = fields.Boolean(compute="_compute_credit_approval")
     credit_last_decision = fields.Text(string="Dernière décision", compute="_compute_credit_approval")
+    # Badge affiché : distingue une dérogation accordée mais dépassée
+    # (commande augmentée depuis) d'une dérogation toujours valable.
+    credit_approval_badge = fields.Selection(
+        [
+            ("none", "Aucune"),
+            ("pending", "Dérogation demandée"),
+            ("approved", "Dérogation accordée"),
+            ("exceeded", "Dérogation dépassée"),
+            ("refused", "Dérogation refusée"),
+        ],
+        string="Dérogation crédit",
+        compute="_compute_credit_approval",
+    )
     credit_override_ids = fields.One2many(
         "credit.override.log", "order_id", string="Dérogations", readonly=True,
     )
@@ -76,6 +89,11 @@ class SaleOrder(models.Model):
                 and order.credit_block_reason
                 and not order.credit_approval_valid
                 and order.credit_approval_state != "pending"
+            )
+            order.credit_approval_badge = (
+                "exceeded"
+                if order.credit_approval_state == "approved" and not order.credit_approval_valid
+                else order.credit_approval_state
             )
             last = order.credit_override_ids[:1]
             order.credit_last_decision = (

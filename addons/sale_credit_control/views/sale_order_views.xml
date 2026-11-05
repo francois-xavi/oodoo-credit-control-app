@@ -70,11 +70,12 @@
 
             <!-- Badge à côté du client -->
             <xpath expr="//group[@name='partner_details']/field[@name='partner_id']" position="after">
-                <field name="credit_approval_state" widget="badge"
-                       invisible="credit_approval_state == 'none'"
-                       decoration-warning="credit_approval_state == 'pending'"
-                       decoration-success="credit_approval_state == 'approved'"
-                       decoration-danger="credit_approval_state == 'refused'"/>
+                <field name="credit_approval_state" invisible="1"/>
+                <field name="credit_approval_badge" widget="badge"
+                       invisible="credit_approval_badge == 'none'"
+                       decoration-warning="credit_approval_badge in ('pending', 'exceeded')"
+                       decoration-success="credit_approval_badge == 'approved'"
+                       decoration-danger="credit_approval_badge == 'refused'"/>
             </xpath>
 
             <!-- Historique des décisions sur cette commande -->

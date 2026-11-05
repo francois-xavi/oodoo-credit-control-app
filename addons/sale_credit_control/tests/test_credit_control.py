@@ -207,6 +207,7 @@ class TestCreditControl(TransactionCase):
         self._request_and_decide(order, "approved")
         order.with_user(self.salesman).order_line.price_unit = 5000
         self.assertFalse(order.credit_approval_valid)
+        self.assertEqual(order.credit_approval_badge, "exceeded", "Le badge signale la dérogation dépassée")
         self.assertTrue(order.credit_can_request)
         with self.assertRaises(UserError):
             order.with_user(self.salesman).action_confirm()
