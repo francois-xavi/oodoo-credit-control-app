@@ -1,1 +1,1 @@
-# Tests automatiques des règles de blocage (étape 8).
+from . import test_credit_control

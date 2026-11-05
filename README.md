@@ -19,7 +19,7 @@ Puis ouvrir http://localhost:8069
 
 - Créer les données (idempotent, relançable sans doublons) :
   `docker compose run --rm -T odoo odoo shell -d demo --no-http < scripts/seed_demo.py`
-- Sauvegarde de référence : `backups/demo_etape7.zip` (la plus récente) (non versionnée).
+- Sauvegarde de référence : `backups/demo_etape8.zip` (la plus récente) (non versionnée).
   Restaurer : http://localhost:8069/web/database/manager → « Restaurer une base », avec le mot de passe maître.
   Attention : les retards sont relatifs à la date de création des factures.
 
@@ -29,6 +29,17 @@ Puis ouvrir http://localhost:8069
   `docker compose run --rm odoo odoo -d demo -u sale_credit_control --stop-after-init --no-http`
   puis `docker compose restart odoo`
 - Arrêter : `docker compose down` (les données sont conservées dans les volumes)
+
+## Tests automatiques (19 tests, environ 5 min avec l'installation)
+Sur une base neuve `test_credit`, pour ne pas toucher à la base de démo :
+
+    docker compose run --rm -T odoo odoo -d test_credit -i sale_credit_control --test-enable --test-tags /sale_credit_control --stop-after-init --no-http
+
+Depuis Git Bash, préfixer par `MSYS_NO_PATHCONV=1` (sinon `/sale_credit_control` est converti en chemin Windows).
+Résultat attendu dans les logs : `0 failed, 0 error(s) of 19 tests`.
+Ensuite, supprimer la base de test (sinon l'écran de connexion propose de choisir une base) :
+
+    docker compose exec -T db dropdb -U odoo test_credit
 
 ## Plan de réalisation
 Voir `../PLAN_REALISATION.md`

@@ -6,11 +6,15 @@
     </record>
 
     <!-- Responsable crédit : fixe les plafonds et approuve les dérogations.
-         Hérite des droits commerciaux pour voir toutes les commandes. -->
+         Hérite des droits commerciaux pour voir toutes les commandes, et
+         du droit de modifier les fiches clients pour y fixer les plafonds. -->
     <record id="group_credit_manager" model="res.groups">
         <field name="name">Responsable crédit</field>
         <field name="category_id" ref="module_category_credit_control"/>
-        <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
+        <field name="implied_ids" eval="[
+            (4, ref('sales_team.group_sale_salesman_all_leads')),
+            (4, ref('base.group_partner_manager')),
+        ]"/>
         <field name="users" eval="[(4, ref('base.user_admin'))]"/>
     </record>
 </odoo>
