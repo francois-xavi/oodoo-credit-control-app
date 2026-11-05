@@ -19,8 +19,11 @@ Puis ouvrir http://localhost:8069
 
 - Créer les données (idempotent, relançable sans doublons) :
   `docker compose run --rm -T odoo odoo shell -d demo --no-http < scripts/seed_demo.py`
-- Sauvegarde de référence : `backups/demo_pret_pour_demo.zip` (état propre, prêt pour la démo) (non versionnée).
-  Restaurer : http://localhost:8069/web/database/manager → « Restaurer une base », avec le mot de passe maître.
+- **Remettre la démo à zéro** (avant chaque répétition, environ 1 minute) :
+  `powershell -ExecutionPolicy Bypass -File scripts\reset_demo.ps1`
+  Démarre Docker si besoin, restaure `backups/demo_pret_pour_demo.zip` et contrôle le résultat.
+- Restauration manuelle : http://localhost:8069/web/database/manager → « Restaurer une base », avec le mot de passe maître.
+- Fiche de démo (scénario, textes, questions pièges) : `../FICHE_DEMO.md`
   Attention : les retards sont relatifs à la date de création des factures.
 
 ## Commandes utiles
