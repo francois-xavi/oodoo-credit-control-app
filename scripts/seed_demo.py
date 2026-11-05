@@ -35,11 +35,15 @@ if not paul:
         "groups_id": [(6, 0, [
             env.ref("base.group_user").id,
             env.ref("sales_team.group_sale_salesman_all_leads").id,
+            env.ref("base.group_partner_manager").id,  # créer/modifier des clients
         ])],
     })
     print("Utilisateur créé :", paul.name)
 else:
     print("Utilisateur déjà présent :", paul.name)
+# Un commercial crée et met à jour ses fiches clients (droit natif Odoo).
+if not paul.has_group("base.group_partner_manager"):
+    paul.groups_id = [(4, env.ref("base.group_partner_manager").id)]
 # Odoo exige un e-mail d'expéditeur pour notifier les activités.
 if not paul.email:
     paul.email = PAUL_EMAIL

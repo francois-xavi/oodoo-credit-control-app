@@ -30,11 +30,25 @@
                     </div>
                     <group>
                         <group string="Politique de crédit" name="credit_policy_group">
+                            <!-- Responsable crédit : modifiable -->
                             <field name="credit_policy" widget="radio"
-                                   readonly="parent_id and not is_company"/>
+                                   readonly="parent_id and not is_company"
+                                   groups="sale_credit_control.group_credit_manager"/>
                             <field name="sale_credit_limit"
                                    readonly="parent_id and not is_company"
-                                   invisible="credit_policy == 'exempt'"/>
+                                   invisible="credit_policy == 'exempt'"
+                                   groups="sale_credit_control.group_credit_manager"/>
+                            <!-- Autres utilisateurs : lecture seule -->
+                            <field name="credit_policy" readonly="1"
+                                   groups="!sale_credit_control.group_credit_manager"/>
+                            <field name="sale_credit_limit" readonly="1"
+                                   invisible="credit_policy == 'exempt'"
+                                   groups="!sale_credit_control.group_credit_manager"/>
+                            <div class="text-muted small" colspan="2"
+                                 groups="!sale_credit_control.group_credit_manager">
+                                <i class="fa fa-lock me-1" title="Verrouillé"/>
+                                Modifiable uniquement par un responsable crédit.
+                            </div>
                         </group>
                         <group string="Situation en temps réel" name="credit_situation_group">
                             <field name="credit_invoiced_due"/>

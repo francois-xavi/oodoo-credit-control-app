@@ -168,6 +168,25 @@ class SaleOrder(models.Model):
         return False
 
     # ------------------------------------------------------------------
+    # Sécurité : le commercial peut modifier sa commande, mais jamais
+    # s'accorder lui-même une dérogation (même en écrivant via l'API).
+    # ------------------------------------------------------------------
+    def _check_credit_decision_vals(self, vals):
+        decides = vals.get("credit_approval_state") in ("approved", "refused")
+        if (decides or vals.get("credit_approved_amount")) and not self.env.su:
+            self._check_credit_manager()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            self._check_credit_decision_vals(vals)
+        return super().create(vals_list)
+
+    def write(self, vals):
+        self._check_credit_decision_vals(vals)
+        return super().write(vals)
+
+    # ------------------------------------------------------------------
     # Boutons
     # ------------------------------------------------------------------
     def _open_credit_wizard(self, decision, title):

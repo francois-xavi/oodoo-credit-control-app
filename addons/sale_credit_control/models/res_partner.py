@@ -1,4 +1,8 @@
 from odoo import api, fields, models
+from odoo.exceptions import AccessError
+
+CREDIT_MANAGER_GROUP = "sale_credit_control.group_credit_manager"
+CREDIT_POLICY_FIELDS = ("sale_credit_limit", "credit_policy")
 
 
 class ResPartner(models.Model):
@@ -63,6 +67,43 @@ class ResPartner(models.Model):
     @api.model
     def _commercial_fields(self):
         return super()._commercial_fields() + ["sale_credit_limit", "credit_policy"]
+
+    # ------------------------------------------------------------------
+    # Sécurité : seul un responsable crédit fixe la politique de crédit.
+    # Contrôle dans le Python (et pas seulement dans l'écran) : il
+    # s'applique aussi aux imports, à l'API et aux automatisations.
+    # ------------------------------------------------------------------
+    def _is_credit_manager(self):
+        return self.env.su or self.env.user.has_group(CREDIT_MANAGER_GROUP)
+
+    def _raise_credit_policy_access(self):
+        raise AccessError(
+            "Seul un responsable crédit peut modifier le plafond ou le statut crédit d'un client."
+        )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        if not self._is_credit_manager():
+            for vals in vals_list:
+                # Un contact hérite des valeurs de sa société : rien à contrôler.
+                if vals.get("parent_id"):
+                    continue
+                if vals.get("sale_credit_limit") or vals.get("credit_policy", "normal") != "normal":
+                    self._raise_credit_policy_access()
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if not self._is_credit_manager() and any(f in vals for f in CREDIT_POLICY_FIELDS):
+            # On ne contrôle que les sociétés « commerciales » : sur les
+            # contacts, Odoo recopie automatiquement les valeurs de la société.
+            commercial = self.filtered(lambda p: p.commercial_partner_id == p)
+            for partner in commercial:
+                if any(
+                    f in vals and partner[f] != vals[f]
+                    for f in CREDIT_POLICY_FIELDS
+                ):
+                    self._raise_credit_policy_access()
+        return super().write(vals)
 
     @api.model
     def _get_credit_params(self):
