@@ -3,7 +3,6 @@ from odoo.exceptions import AccessError
 
 CREDIT_MANAGER_GROUP = "sale_credit_control.group_credit_manager"
 CREDIT_POLICY_FIELDS = ("sale_credit_limit", "credit_policy")
-# Champs calculés à relire « frais » avant chaque décision
 CREDIT_SITUATION_FIELDS = [
     "credit_invoiced_due", "credit_uninvoiced_orders", "credit_exposure", "credit_available",
     "credit_overdue_amount", "credit_overdue_count", "credit_overdue_max_days",

@@ -1,5 +1,5 @@
 # Environnement local de démo : Odoo 18 Community + PostgreSQL 16
-# Démarrer : docker compose up -d      Logs : docker compose logs -f --tail=100 odoo
+# Logs : docker compose logs -f --tail=100 odoo
 
 services:
   db:
@@ -27,7 +27,7 @@ services:
       - ./addons:/mnt/extra-addons
       - ./config:/etc/odoo
       - odoo-web-data:/var/lib/odoo
-    # --dev=xml : les vues XML se rechargent sans redémarrer Odoo.
+      
     command: -- --dev=xml
     restart: unless-stopped
 
